@@ -20,5 +20,16 @@
   },
   "peerDependencies": {
     "express": "^4.14.1"
-  }
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wocanbe/luck7-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wocanbe/luck7-api.git/issues"
+  },
+  "homepage": "https://github.com/wocanbe/luck7-api.git#readme"
 }
