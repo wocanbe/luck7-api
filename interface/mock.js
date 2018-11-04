@@ -31,8 +31,8 @@ class MockInterface {
     if (checkOrigin(req, this.allowOrigin, this.safeMode)) { // 没通过模拟数据的域名授权
       res.status(403).send()
     } else {
-      console.log('Mock used:', this.mockPath + targetFile)
       const targetFile = mockFile
+      console.log('Mock used:', this.mockPath + targetFile)
       let apiRes
       let useParams = Object.assign({}, params, req.query)
       if (req.method === 'OPTIONS') {
