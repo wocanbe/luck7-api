@@ -1,0 +1,24 @@
+{
+  "name": "luck7-api",
+  "version": "0.1.0",
+  "author": "584069777@qq.com",
+  "description": "a api middleware",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "mock",
+    "api",
+    "proxy",
+    "test"
+  ],
+  "dependencies": {
+    "http-proxy-middleware": "^0.17.4",
+    "lodash": "^4.17.10"
+  },
+  "peerDependencies": {
+    "express": "^4.14.1"
+  }
+}
