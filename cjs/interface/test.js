@@ -1,3 +1,4 @@
+const isNumber = require('lodash/isNumber')
 const ProxyInterface = require('./proxy')
 const testDataFromMock = require('../lib/testFile')
 const {getMockParams} = require('../lib/utils')
@@ -16,11 +17,13 @@ function test (mockPath, req, res, resData, testFile) {
     apiRes.then(result => {
       res.send(result)
     }).catch(e => {
-      if (e.message === 'Status 404') {
+      if (isNumber(e)) {
+        res.status(e).send()
+      } else if (e instanceof Error) {
+        res.status(500).send(e.message)
+      } else {
         console.warn(mockPath + targetFile + ' has\'t testData method or is\'t exist.')
         res.end(resData)
-      } else {
-        res.status(500).send(e.message)
       }
     })
   }

@@ -1,5 +1,6 @@
 'use strict'
 const isBoolean = require('lodash/isBoolean')
+const isNumber = require('lodash/isNumber')
 const getDataFromMock = require('../lib/mockFile')
 const {checkOrigin, addCrosHeader, getMockParams} = require('../lib/utils')
 
@@ -47,10 +48,12 @@ class MockInterface {
         apiRes.then(result => {
           res.send(result)
         }).catch(e => {
-          if (e.message === 'Status 404') {
-            res.status(404).send()
-          } else {
+          if (isNumber(e)) {
+            res.status(e).send()
+          } else if (e instanceof Error) {
             res.status(500).send(e.message)
+          } else {
+            res.status(404).send()
           }
         })
       }

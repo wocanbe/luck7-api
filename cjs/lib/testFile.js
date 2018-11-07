@@ -1,5 +1,6 @@
 'use strict'
 const isFunction = require('lodash/isFunction')
+const isString = require('lodash/isString')
 
 function getDataFromPath (mockPath, apiName, reqMethod, reqData, resData) {
   return new Promise((resolve, reject) => {
@@ -9,7 +10,7 @@ function getDataFromPath (mockPath, apiName, reqMethod, reqData, resData) {
       try {
         mockFile = require.resolve('../../../../' + filePath)
       } catch (e) {
-        reject(new Error('Status 404'))
+        reject(false)
       }
       if (mockFile) {
         console.log('Test used:', filePath)
@@ -25,10 +26,15 @@ function getDataFromPath (mockPath, apiName, reqMethod, reqData, resData) {
                 reject(e)
               })
             } else {
-              resolve(result)
+              if (isString(result)) {
+                resolve(result)
+              } else {
+                reject(result)
+              }
             }
           } else {
-            reject(new Error(apiName + ' has not test method.'))
+            console.warn(apiName + ' has not test method.')
+            reject(false)
           }
         } catch (e) {
           console.error(e.stack)
@@ -36,7 +42,7 @@ function getDataFromPath (mockPath, apiName, reqMethod, reqData, resData) {
         }
       }
     } else {
-      reject(new Error('Status 404'))
+      reject(false)
     }
   })
 }

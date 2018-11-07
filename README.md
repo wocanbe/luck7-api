@@ -116,3 +116,8 @@ exports.testData = function (method, reqData, resData) {
   })
 }
 ```
+
+注意：
+
+ - getData和testData可以返回Promise,Number(将作为错误码返回给用户),string(作为结果返回)
+ - 其他情况，getData将返回404，testData返回resData的值

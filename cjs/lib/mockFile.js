@@ -1,4 +1,6 @@
 const isFunction = require('lodash/isFunction')
+const isString = require('lodash/isString')
+
 function getDataFromPath (mockPath, apiName, method, params) {
   return new Promise((resolve, reject) => {
     if (apiName) {
@@ -7,7 +9,7 @@ function getDataFromPath (mockPath, apiName, method, params) {
       try {
         mockFile = require.resolve('../../../../' + filePath)
       } catch (e) {
-        reject(new Error('Status 404'))
+        reject(404)
       }
       if (mockFile) {
         console.log('Mock used:', filePath)
@@ -23,7 +25,11 @@ function getDataFromPath (mockPath, apiName, method, params) {
                 reject(e)
               })
             } else {
-              resolve(result)
+              if (isString(result)) {
+                resolve(result)
+              } else {
+                reject(result)
+              }
             }
           } else {
             reject(new Error(apiName + ' has not mock method.'))
@@ -34,7 +40,7 @@ function getDataFromPath (mockPath, apiName, method, params) {
         }
       }
     } else {
-      reject(new Error('Status 404'))
+      reject(404)
     }
   })
 }
