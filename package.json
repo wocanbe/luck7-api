@@ -3,10 +3,13 @@
   "version": "0.1.1",
   "author": "584069777@qq.com",
   "description": "a api middleware",
-  "main": "index.js",
+  "main": "cjs/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "cjs"
+  ],
   "keywords": [
     "express",
     "mock",

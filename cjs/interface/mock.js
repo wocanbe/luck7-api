@@ -32,7 +32,6 @@ class MockInterface {
       res.status(403).send()
     } else {
       const targetFile = mockFile
-      console.log('Mock used:', this.mockPath + targetFile)
       let apiRes
       let useParams = Object.assign({}, params, req.query)
       if (req.method === 'OPTIONS') {

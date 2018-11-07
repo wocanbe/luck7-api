@@ -12,11 +12,11 @@
   app.use(bodyParser.urlencoded({ extended: false }));
   const apiConfig = [{
     path:'/subject/:userId',
-    file:'/userInfo'
+    target:'/userInfo'
   },
   {
     path:'/demo/:id',
-    file:'/demo'
+    target:'/demo'
   }]
   // 模拟模式
   app.use(apiMiddleware({
@@ -75,11 +75,20 @@ const reqRule = {
   id: {required: true, message: '缺少ID'}
 }
 const resRule = {
-  name: {required: true, message: '缺少姓名'},
-  age: [
-    {required: true, message: '缺少年龄'},
-    {type: 'number', message: '年龄类型错误'}
-  ]
+  response: {
+    type: 'array',
+    required: true,
+    defaultField: {
+      type: 'object',
+      fields: {
+        name: {required: true, message: '缺少姓名'},
+        age: [
+          {type: 'number', message: '年龄类型错误'},
+          {type: 'number', required: true, message: '缺少年龄'}
+        ]
+      }
+    }
+  }
 }
 exports.testData = function (method, reqData, resData) {
   const reqValid = new Schema(reqRule)
@@ -92,9 +101,12 @@ exports.testData = function (method, reqData, resData) {
     if (validStatus) {
       reject(new Error('请求参数错误:' + JSON.stringify(validStatus)))
     } else {
-      resValid.validate(resData, (errors, fields) => {
-        if (errors) validStatus = errors
-      })
+      resValid.validate(
+        {response: resData}, // 注意：async-validator必须制定item
+        (errors, fields) => {
+          if (errors) validStatus = errors
+        }
+      )
       if (validStatus) {
         reject(new Error('返回参数错误:' + JSON.stringify(validStatus)))
       } else {
