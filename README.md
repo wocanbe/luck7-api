@@ -119,5 +119,7 @@ exports.testData = function (method, reqData, resData) {
 
 注意：
 
- - getData和testData可以返回Promise,Number(将作为错误码返回给用户),string(作为结果返回)
- - 其他情况，getData将返回404，testData返回resData的值
+ - getData和testData可以返回任意类型(包含Promise)
+ - 以下两种情况将作为错误处理
+  - Error类型对象，返回500，信息内容为e.message
+  - [number,string]格式的数组，返回状态为array[0],信息内容为array[1]

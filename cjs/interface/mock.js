@@ -1,6 +1,4 @@
-'use strict'
 const isBoolean = require('lodash/isBoolean')
-const isNumber = require('lodash/isNumber')
 const getDataFromMock = require('../lib/mockFile')
 const {checkOrigin, addCrosHeader, getMockParams} = require('../lib/utils')
 
@@ -9,6 +7,7 @@ class MockInterface {
     this.isCookie = config.crosCookie || false
     this.mockPath = config.mockPath || 'mock'
     this.allowOrigin = config.allowOrigin || []
+    this.prefetch = config.prefetch
     this.safeMode = isBoolean(config.safeMode) ? config.safeMode : false // 当host与origin一致时,是否进一步检查host
 
     this.run = (req, res, next) => {
@@ -46,15 +45,30 @@ class MockInterface {
       if (apiRes) {
         addCrosHeader(req, res, this.isCookie)
         apiRes.then(result => {
-          res.send(result)
+          let response = result
+          if (this.prefetch) {
+            response = this.prefetch(result)
+          }
+          res.setHeader('Content-Type', 'application/json;charset=utf-8')
+          res.send(response)
         }).catch(e => {
-          if (isNumber(e)) {
-            res.status(e).send()
+          // if (this.prefetch) this.prefetch(undefined, e)
+          // else {
+          if (e instanceof Array) {
+            res.status(e[0])
+            if (e[0] === 301 || e[0] === 302) {
+              res.setHeader('Location', e[1])
+              res.send()
+            } else {
+              res.setHeader('Content-Type', 'text/plain;charset=utf-8')
+              res.send(e[1])
+            }
           } else if (e instanceof Error) {
             res.status(500).send(e.message)
           } else {
             res.status(404).send()
           }
+          // }
         })
       }
     }

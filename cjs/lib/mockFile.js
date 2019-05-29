@@ -1,20 +1,23 @@
+const chalk = require('chalk')
 const isFunction = require('lodash/isFunction')
+const isArray = require('lodash/isArray')
+const isNumber = require('lodash/isNumber')
 const isString = require('lodash/isString')
 
-function getDataFromPath (mockPath, apiName, method, params) {
+function getDataFromPath (mockPath, apiName, method, params, debug) {
   return new Promise((resolve, reject) => {
     if (apiName) {
       const filePath = mockPath + apiName
       let mockFile
       try {
-        mockFile = require.resolve('../../../../' + filePath)
+        mockFile = require.resolve(process.cwd() + '/' + filePath)
       } catch (e) {
-        reject(404)
+        reject(false)
       }
       if (mockFile) {
-        console.log('Mock used:', filePath)
-        delete require.cache[mockFile]
+        if (debug) console.log(chalk`{cyanBright Mock used:} {white ${filePath}}`)
         try {
+          delete require.cache[mockFile]
           const resultFile = require(mockFile)
           if (isFunction(resultFile.getData)) {
             const result = resultFile.getData(method, params)
@@ -24,12 +27,16 @@ function getDataFromPath (mockPath, apiName, method, params) {
               }).catch(e => {
                 reject(e)
               })
-            } else {
-              if (isString(result)) {
-                resolve(result)
-              } else {
+            } else if (result instanceof Error) {
+              reject(result)
+            } else if (isArray(result)) {
+              if (result.length === 2 && isNumber(result[0]) && isString(result[1])) {
                 reject(result)
+              } else {
+                resolve(result)
               }
+            } else {
+              resolve(result)
             }
           } else {
             reject(new Error(apiName + ' has not mock method.'))
@@ -40,7 +47,7 @@ function getDataFromPath (mockPath, apiName, method, params) {
         }
       }
     } else {
-      reject(404)
+      reject(false)
     }
   })
 }

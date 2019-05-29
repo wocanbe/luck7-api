@@ -8,7 +8,6 @@ module.exports.addCrosHeader = function (req, res, allowCookie) {
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS')
     res.sendStatus(200) // 让options请求快速返回
   } else {
-    res.setHeader('Content-Type', 'application/json;charset=utf-8')
     res.header('Cache-Control', 'no-cache, no-store, must-revalidate')
     res.header('Pragma', 'no-cache')
     res.header('Expires', 0)
@@ -32,7 +31,7 @@ module.exports.checkOrigin = function (req, allowOrigin, safeMode) {
   const hostOrigin = protocol + '://' + headers.host
   if (origin === hostOrigin) {
     if (safeMode) return allowOrigin.indexOf(hostOrigin) === -1
-    return !(origin === hostOrigin)
+    return false
   }
   return allowOrigin.indexOf(origin) === -1
 }

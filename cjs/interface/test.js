@@ -1,4 +1,3 @@
-const isNumber = require('lodash/isNumber')
 const ProxyInterface = require('./proxy')
 const testDataFromMock = require('../lib/testFile')
 const {getMockParams} = require('../lib/utils')
@@ -17,8 +16,8 @@ function test (mockPath, req, res, resData, testFile) {
     apiRes.then(result => {
       res.send(result)
     }).catch(e => {
-      if (isNumber(e)) {
-        res.status(e).send()
+      if (e instanceof Array) {
+        res.status(e[0]).send(e[1])
       } else if (e instanceof Error) {
         res.status(500).send(e.message)
       } else {

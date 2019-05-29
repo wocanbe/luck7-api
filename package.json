@@ -1,14 +1,14 @@
 {
   "name": "luck7-api",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": "584069777@qq.com",
   "description": "a api middleware",
-  "main": "cjs/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node build"
   },
   "files": [
-    "cjs"
+    "dist"
   ],
   "keywords": [
     "express",
@@ -18,11 +18,15 @@
     "test"
   ],
   "dependencies": {
-    "http-proxy-middleware": "^0.17.4",
-    "lodash": "^4.17.10"
+    "http-proxy-middleware": "^0.17.4"
+  },
+  "devDependencies": {
+    "uglify-es": "^3.3.9"
   },
   "peerDependencies": {
-    "express": "^4.14.1"
+    "chalk": "^2.0.1",
+    "express": "^4.14.1",
+    "lodash": "^4.17.10"
   },
   "engines": {
     "node": ">=8"
