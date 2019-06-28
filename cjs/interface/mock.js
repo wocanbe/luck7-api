@@ -44,16 +44,11 @@ class MockInterface {
       }
       if (apiRes) {
         addCrosHeader(req, res, this.isCookie)
-        apiRes.then(result => {
-          let response = result
-          if (this.prefetch) {
-            response = this.prefetch(result)
-          }
+        const backRes = this.prefetch ? this.prefetch(apiRes) : apiRes
+        backRes.then(result => {
           res.setHeader('Content-Type', 'application/json;charset=utf-8')
-          res.send(response)
+          res.send(result)
         }).catch(e => {
-          // if (this.prefetch) this.prefetch(undefined, e)
-          // else {
           if (e instanceof Array) {
             res.status(e[0])
             if (e[0] === 301 || e[0] === 302) {
