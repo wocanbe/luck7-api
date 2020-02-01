@@ -22,7 +22,7 @@ function getDataFromPath (mockPath, apiName, reqMethod, reqData, resData, debug)
           if (isFunction(testFile.testData)) {
             const result = testFile.testData(reqMethod, reqData, resData)
             if (result instanceof Promise) {
-              result.then((resData) => {
+              result.then(resData => {
                 resolve(resData)
               }).catch(e => {
                 reject(e)

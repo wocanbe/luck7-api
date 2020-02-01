@@ -1,6 +1,12 @@
-# a api middleware
+# luck7-api
 
-## demo
+一个不错的进行数据模拟、校验的express中间件。
+对数据的模拟和校验，使用了尽量贴近真实情况的模式，会发起真实的请求，也有真实的返回。
+
+## 配合express进行数据模拟、校验
+
+### express配置
+
 ```javascript
   var express = require('express')
   var bodyParser = require('body-parser')
@@ -60,7 +66,7 @@
   server = app.listen(3000)
 ```
 
-## api demo
+### 模拟文件配置
 ```javascript
 const Schema = require('async-validator')
 exports.getData = function(method, data){
@@ -118,8 +124,36 @@ exports.testData = function (method, reqData, resData) {
 ```
 
 注意：
+ - 模拟模式支持js和json两种模拟数据文件，测试模式只支持js文件
+ 
+ 模拟文件路径和名称规则为``${path}.js``、``${path}.json``或者``${path}_${method}.json``
 
- - getData和testData可以返回任意类型(包含Promise)
- - 以下两种情况将作为错误处理
+ - 使用js作为模拟数据文件时，需要实现getData和testData(测试模式)方法，方法可以返回任意类型(包含Promise)
+ - getData返回数据为以下两种情况时，将作为错误处理
   - Error类型对象，返回500，信息内容为e.message
   - [number,string]格式的数组，返回状态为array[0],信息内容为array[1]
+ - 
+## 配合vue-cli4.X使用
+
+你是否有经历过明明跟后端约定的字段类型是字符串，临近测试，后端用了时间戳，吵不过回去默默的在一大堆逻辑中查找修改代码，用了luck7-api，你可以自由的在代理模式和校验模式切换，在后端修改接口的第一时间发现，及时修改代码。
+配置示例:
+```js
+module.exports = {
+  // ...
+  // webpack-dev-server 相关配置
+  devServer: {
+    // 模拟数据开始
+    before (app) {
+      app.get('/api/seller', (req, res) => {
+        res.json({
+          // 这里是你的json内容
+          errno: 0,
+          data: seller
+        })
+      })
+    }   
+  }
+}
+```
+
+

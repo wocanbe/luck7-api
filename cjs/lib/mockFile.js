@@ -4,46 +4,80 @@ const isArray = require('lodash/isArray')
 const isNumber = require('lodash/isNumber')
 const isString = require('lodash/isString')
 
+function jsMock (mockFile, filePath, method, params, resolve, reject) { // mockPath, apiName, method, params, debug
+  try {
+    delete require.cache[mockFile]
+    const resultFile = require(mockFile)
+    if (isFunction(resultFile.getData)) {
+      const result = resultFile.getData(method, params)
+      if (result instanceof Promise) {
+        result.then((resData) => {
+          resolve(resData)
+        }).catch(e => {
+          reject(e)
+        })
+      } else if (result instanceof Error) {
+        reject(result)
+      } else if (isArray(result)) {
+        if (result.length === 2 && isNumber(result[0]) && isString(result[1])) {
+          reject(result)
+        } else {
+          resolve(result)
+        }
+      } else {
+        resolve(result)
+      }
+    } else {
+      reject(new Error(`${filePath} has not mock method.`))
+    }
+  } catch (e) {
+    console.error(e.stack)
+    reject(new Error(`${filePath} has errors,please check the code.`))
+  }
+}
+function jsonMock (mockFile, filePath, resolve, reject) {
+  try {
+    delete require.cache[mockFile]
+    const result = require(mockFile)
+    resolve(result)
+  } catch (e) {
+    console.error(e.stack)
+    reject(new Error(`${filePath} has errors,please check the code.`))
+  }
+}
 function getDataFromPath (mockPath, apiName, method, params, debug) {
   return new Promise((resolve, reject) => {
     if (apiName) {
       const filePath = mockPath + apiName
-      let mockFile
+      let mockFile,xdMockFile
       try {
-        mockFile = require.resolve(process.cwd() + '/' + filePath)
+        xdMockFile = filePath + '.js'
+        mockFile = require.resolve(process.cwd() + '/' + xdMockFile)
+        if (mockFile) {
+          if (debug) console.log(chalk`{cyanBright Mock used:} {white ${xdMockFile}}`)
+          jsMock(mockFile, xdMockFile, method, params, resolve, reject)
+        }
       } catch (e) {
-        reject(false)
-      }
-      if (mockFile) {
-        if (debug) console.log(chalk`{cyanBright Mock used:} {white ${filePath}}`)
         try {
-          delete require.cache[mockFile]
-          const resultFile = require(mockFile)
-          if (isFunction(resultFile.getData)) {
-            const result = resultFile.getData(method, params)
-            if (result instanceof Promise) {
-              result.then((resData) => {
-                resolve(resData)
-              }).catch(e => {
-                reject(e)
-              })
-            } else if (result instanceof Error) {
-              reject(result)
-            } else if (isArray(result)) {
-              if (result.length === 2 && isNumber(result[0]) && isString(result[1])) {
-                reject(result)
-              } else {
-                resolve(result)
-              }
-            } else {
-              resolve(result)
-            }
-          } else {
-            reject(new Error(apiName + ' has not mock method.'))
+          const jsonPath = filePath+'_'+method.toLowerCase()
+          xdMockFile = jsonPath + '.json'
+          mockFile = require.resolve(process.cwd() + '/' + xdMockFile)
+          if (mockFile) {
+            if (debug) console.log(chalk`{cyanBright Mock used:} {white ${xdMockFile}}`)
+            jsonMock(mockFile, xdMockFile, resolve, reject)
           }
         } catch (e) {
-          console.error(e.stack)
-          reject(new Error(apiName + ' has errors,please check the code.'))
+          try {
+            xdMockFile = filePath + '.json'
+            mockFile = require.resolve(process.cwd() + '/' + xdMockFile)
+            if (mockFile) {
+              if (debug) console.log(chalk`{cyanBright Mock used:} {white ${xdMockFile}}`)
+              jsonMock(mockFile, xdMockFile, resolve, reject)
+            }
+          } catch (e) {
+            // can't found mock file
+            reject(false)
+          }
         }
       }
     } else {
