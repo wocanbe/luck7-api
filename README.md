@@ -31,8 +31,11 @@
     rules: apiConfig,
     config: {
       allowOrigin: ['http://test.liuying.com'],
+      // mockPath: 'mock',
       // crosCookie: true,
-      // safeMode: false
+      // safeMode: false,
+      // prefetch: res => Mock(res), 可以对返回数据进行拦截统一处理
+      // allowHeader: 'token' 跨域请求允许添加自定义header头
     }
   }))
   // 代理模式

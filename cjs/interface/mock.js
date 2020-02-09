@@ -7,6 +7,7 @@ class MockInterface {
     this.isCookie = config.crosCookie || false
     this.mockPath = config.mockPath || 'mock'
     this.allowOrigin = config.allowOrigin || []
+    this.allowHeader = config.allowHeader || ''
     this.prefetch = config.prefetch
     this.safeMode = isBoolean(config.safeMode) ? config.safeMode : false // 当host与origin一致时,是否进一步检查host
 
@@ -35,7 +36,7 @@ class MockInterface {
       let apiRes
       let useParams = Object.assign({}, params, req.query)
       if (req.method === 'OPTIONS') {
-        addCrosHeader(req, res, this.isCookie)
+        addCrosHeader(req, res, this.isCookie, this.allowHeader)
       } else if (req.method === 'GET') {
         apiRes = getDataFromMock(this.mockPath, targetFile, req.method, useParams)
       } else {
@@ -43,7 +44,7 @@ class MockInterface {
         apiRes = getDataFromMock(this.mockPath, targetFile, req.method, useParams)
       }
       if (apiRes) {
-        addCrosHeader(req, res, this.isCookie)
+        addCrosHeader(req, res, this.isCookie, this.allowHeader)
         const backRes = this.prefetch ? this.prefetch(apiRes) : apiRes
         backRes.then(result => {
           res.setHeader('Content-Type', 'application/json;charset=utf-8')

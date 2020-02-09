@@ -1,10 +1,12 @@
-module.exports.addCrosHeader = function (req, res, allowCookie) {
+module.exports.addCrosHeader = function (req, res, allowCookie, userHeader) {
   res.header('Access-Control-Allow-Origin', req.headers.origin)
   if (allowCookie) {
     res.header('Access-Control-Allow-Credentials', 'true')
   }
+  let allowHeader = 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With'
+  if (userHeader) allowHeader += ', ' + userHeader
   if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild')
+    res.header('Access-Control-Allow-Headers', allowHeader)
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS')
     res.sendStatus(200) // 让options请求快速返回
   } else {
