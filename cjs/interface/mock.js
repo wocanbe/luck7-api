@@ -12,7 +12,7 @@ class MockInterface {
     this.safeMode = isBoolean(config.safeMode) ? config.safeMode : false // 当host与origin一致时,是否进一步检查host
 
     this.run = (req, res, next) => {
-      const reqPath = req.originalUrl || req.url
+      const reqPath = req.originalUrl.split('?')[0]
       if (reqPath.indexOf(path) === 0) {
         let params
         let targetFile = req.path.replace(path, '')
@@ -22,13 +22,13 @@ class MockInterface {
           params = result[0]
           targetFile = result[1]
         }
-        this.mock(req, res, params, targetFile)
+        this.mock(req, res, params, targetFile, reqPath.replace(path, ''))
       } else {
         next()
       }
     }
   }
-  mock (req, res, params, mockFile) {
+  mock (req, res, params, mockFile, reqPath) {
     if (checkOrigin(req, this.allowOrigin, this.safeMode)) { // 没通过模拟数据的域名授权
       res.status(403).send()
     } else {
@@ -38,10 +38,10 @@ class MockInterface {
       if (req.method === 'OPTIONS') {
         addCrosHeader(req, res, this.isCookie, this.allowHeader)
       } else if (req.method === 'GET') {
-        apiRes = getDataFromMock(this.mockPath, targetFile, req.method, useParams)
+        apiRes = getDataFromMock(this.mockPath, targetFile, req.method, useParams, reqPath)
       } else {
         useParams = Object.assign({}, useParams, req.body)
-        apiRes = getDataFromMock(this.mockPath, targetFile, req.method, useParams)
+        apiRes = getDataFromMock(this.mockPath, targetFile, req.method, useParams, reqPath)
       }
       if (apiRes) {
         addCrosHeader(req, res, this.isCookie, this.allowHeader)

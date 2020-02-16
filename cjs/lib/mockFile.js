@@ -4,12 +4,12 @@ const isArray = require('lodash/isArray')
 const isNumber = require('lodash/isNumber')
 const isString = require('lodash/isString')
 
-function jsMock (mockFile, filePath, method, params, resolve, reject) { // mockPath, apiName, method, params, debug
+function jsMock (mockFile, filePath, method, params, resolve, reject, reqPath) { // mockPath, apiName, method, params, debug
   try {
     delete require.cache[mockFile]
     const resultFile = require(mockFile)
     if (isFunction(resultFile.getData)) {
-      const result = resultFile.getData(method, params)
+      const result = resultFile.getData(method, params, reqPath)
       if (result instanceof Promise) {
         result.then((resData) => {
           resolve(resData)
@@ -45,7 +45,7 @@ function jsonMock (mockFile, filePath, resolve, reject) {
     reject(new Error(`${filePath} has errors,please check the code.`))
   }
 }
-function getDataFromPath (mockPath, apiName, method, params, debug) {
+function getDataFromPath (mockPath, apiName, method, params, reqPath, debug) {
   return new Promise((resolve, reject) => {
     if (apiName) {
       const filePath = mockPath + apiName
@@ -55,7 +55,7 @@ function getDataFromPath (mockPath, apiName, method, params, debug) {
         mockFile = require.resolve(process.cwd() + '/' + xdMockFile)
         if (mockFile) {
           if (debug) console.log(chalk`{cyanBright Mock used:} {white ${xdMockFile}}`)
-          jsMock(mockFile, xdMockFile, method, params, resolve, reject)
+          jsMock(mockFile, xdMockFile, method, params, resolve, reject, reqPath)
         }
       } catch (e) {
         try {

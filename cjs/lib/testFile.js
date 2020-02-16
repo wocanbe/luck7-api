@@ -4,7 +4,7 @@ const isArray = require('lodash/isArray')
 const isNumber = require('lodash/isNumber')
 const isString = require('lodash/isString')
 
-function getDataFromPath (mockPath, apiName, reqMethod, reqData, resData, debug) {
+function getDataFromPath (mockPath, apiName, reqMethod, reqData, resData, reqPath, debug) {
   return new Promise((resolve, reject) => {
     if (apiName) {
       const filePath = mockPath + apiName
@@ -20,7 +20,7 @@ function getDataFromPath (mockPath, apiName, reqMethod, reqData, resData, debug)
           delete require.cache[mockFile]
           const testFile = require(mockFile)
           if (isFunction(testFile.testData)) {
-            const result = testFile.testData(reqMethod, reqData, resData)
+            const result = testFile.testData(reqMethod, reqData, resData, reqPath)
             if (result instanceof Promise) {
               result.then(resData => {
                 resolve(resData)

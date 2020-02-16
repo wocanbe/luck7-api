@@ -2,15 +2,15 @@ const ProxyInterface = require('./proxy')
 const testDataFromMock = require('../lib/testFile')
 const {getMockParams} = require('../lib/utils')
 
-function test (mockPath, req, res, resData, testFile) {
+function test (mockPath, req, res, resData, testFile, reqPath) {
   const targetFile = testFile
   let apiRes
   let reqParams = Object.assign({}, req.query)
   if (req.method === 'GET') {
-    apiRes = testDataFromMock(mockPath, targetFile, req.method, reqParams, resData)
+    apiRes = testDataFromMock(mockPath, targetFile, req.method, reqParams, resData, reqPath)
   } else {
     reqParams = Object.assign({}, reqParams, req.body)
-    apiRes = testDataFromMock(mockPath, targetFile, req.method, reqParams, resData)
+    apiRes = testDataFromMock(mockPath, targetFile, req.method, reqParams, resData, reqPath)
   }
   if (apiRes) {
     apiRes.then(result => {
@@ -49,7 +49,7 @@ class TestInterface extends ProxyInterface {
             } catch (e) {
               formatData = resData.toString()
             }
-            test(mockPath, req, res, formatData, targetFile)
+            test(mockPath, req, res, formatData, targetFile, reqPath.replace(path, ''))
           })
         } else {
           res.status(status).send(proxyRes.statusMessage)

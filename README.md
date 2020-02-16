@@ -72,7 +72,7 @@
 ### 模拟文件配置
 ```javascript
 const Schema = require('async-validator')
-exports.getData = function(method, data){
+exports.getData = function(method, data, reqPath){
   return new Promise((resolve, reject) => {
     resolve(JSON.stringify({
       code: 0,
@@ -99,7 +99,7 @@ const resRule = {
     }
   }
 }
-exports.testData = function (method, reqData, resData) {
+exports.testData = function (method, reqData, resData, reqPath) {
   const reqValid = new Schema(reqRule)
   const resValid = new Schema(resRule)
   return new Promise((resolve, reject) => {
