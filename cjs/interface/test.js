@@ -33,7 +33,7 @@ class TestInterface extends ProxyInterface {
     const onProxyRes = function (proxyRes, req, res) {
       const reqPath = req.originalUrl.split('?')[0]
       if (reqPath.indexOf(path) === 0) {
-        let targetFile = reqPath.replace(path, '')
+        let targetFile = req.path.replace(path, '')
         const result = getMockParams(rules.test, targetFile)
         if (result) targetFile = result[1]
         let status = proxyRes.statusCode
@@ -58,6 +58,16 @@ class TestInterface extends ProxyInterface {
     }
     config['onProxyRes'] = onProxyRes
     config['selfHandleResponse'] = true
+    config['onProxyReq'] = function (proxyReq, req) {
+      if (req.body) {
+        let bodyData = JSON.stringify(req.body)
+        // incase if content-type is application/x-www-form-urlencoded -> we need to change to application/json
+        proxyReq.setHeader('Content-Type','application/json')
+        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+        // stream the content
+        proxyReq.write(bodyData)
+      }
+    }
     super(path, rules.proxy, config)
   }
 }
