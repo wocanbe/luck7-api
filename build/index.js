@@ -10,6 +10,7 @@ const fileList = [
   // 'lib/log',
   'lib/mockFile',
   'lib/testFile',
+  'lib/testProxy',
   'lib/utils'
 ]
 
