@@ -29,6 +29,16 @@ function test (mockPath, req, res, resData, testFile, reqPath) {
     })
   }
 }
+
+let getErrorFun = function (errorFun) {
+  return function (req, res, status, resData) {
+    let reqPath = req.originalUrl.split('?')[0]
+    let reqData = Object.assign({}, req.query)
+    if (req.method !== 'GET') reqData = Object.assign({}, reqData, req.body)
+    if (errorFun) errorFun(req.method, reqData, resData, reqPath, status)
+    res.status(status).send(resData)
+  }
+}
 class TestInterface {
   constructor (path, rules, config) {
     let useConfig = config
@@ -39,6 +49,7 @@ class TestInterface {
         pathRewrite[item.path] = item.target
       })
     }
+    const errorBack = getErrorFun(config.errorFun)
     if (pathRewrite) {
       const mockPath = config.mockPath || 'mock'
       useConfig = extend(useConfig, {
@@ -76,7 +87,7 @@ class TestInterface {
                 test(mockPath, req, res, formatData, targetFile, reqPath.replace(path, ''))
               })
             } else {
-              res.status(status).send(proxyRes.statusMessage)
+              errorBack(req, res, status, proxyRes.statusMessage)
             }
           }
         },

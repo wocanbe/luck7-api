@@ -1,6 +1,6 @@
 {
   "name": "luck7-api",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "author": "584069777@qq.com",
   "description": "a api middleware",
   "main": "dist/index.js",
