@@ -16,7 +16,9 @@ class ProxyInterface {
       useConfig = extend(useConfig, {
         pathRewrite,
         onProxyReq: function (proxyReq, req) {
-          if (req.body) {
+          let contentType = req.headers['content-type']
+          if (contentType.includes(';')) contentType = contentType.split(';')[0]
+          if (contentType !== 'multipart/form-data' && req.body) {
             let bodyData = JSON.stringify(req.body)
             // incase if content-type is application/x-www-form-urlencoded -> we need to change to application/json
             proxyReq.setHeader('Content-Type','application/json')
