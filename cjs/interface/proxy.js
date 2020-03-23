@@ -16,7 +16,7 @@ class ProxyInterface {
       useConfig = extend(useConfig, {
         pathRewrite,
         onProxyReq: function (proxyReq, req) {
-          let contentType = req.headers['content-type']
+          let contentType = req.headers['content-type'] || ''
           if (contentType.includes(';')) contentType = contentType.split(';')[0]
           if (contentType !== 'multipart/form-data' && req.body) {
             let bodyData = JSON.stringify(req.body)
