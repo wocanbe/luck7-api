@@ -1,5 +1,6 @@
 const isArray = require('lodash/isArray')
 const extend = require('lodash/extend')
+const isString = require('lodash/isString')
 const Proxy = require('../lib/testProxy')
 const testDataFromMock = require('../lib/testFile')
 const {getMockParams} = require('../lib/utils')
@@ -15,6 +16,7 @@ function test (mockPath, req, res, resData, testFile, reqPath) {
     apiRes = testDataFromMock(mockPath, targetFile, req.method, reqParams, resData, reqPath)
   }
   if (apiRes) {
+    res.header('Content-Type', 'application/json;charset=UTF-8')
     apiRes.then(result => {
       res.send(result)
     }).catch(e => {
@@ -24,7 +26,8 @@ function test (mockPath, req, res, resData, testFile, reqPath) {
         res.status(500).send(e.message)
       } else {
         console.warn(mockPath + targetFile + ' has\'t testData method or is\'t exist.')
-        res.end(resData)
+        if (isString(resData)) res.end(resData)
+        else res.end(JSON.stringify(resData))
       }
     })
   }
@@ -76,7 +79,7 @@ class TestInterface {
             if (result) targetFile = result[1]
             let status = proxyRes.statusCode
             if (status === 200) {
-              let resData = new Buffer('')
+              let resData = Buffer.from('')
               proxyRes.on('data', function (data) {
                 resData = Buffer.concat([resData, data])
               })
